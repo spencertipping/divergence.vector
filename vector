@@ -215,14 +215,20 @@ something most people will normally do. In the future there may be a locking mec
 
 __3uM+GRhsAnxE6BFehM2nkGju4J93JQjqONxKbpE0Cdg
 
-meta::code('main', <<'__jI6607Mf8M/bPRVrZKtDPkLR0MX1HwkTGq84OZw8vEU');
+meta::code('main', <<'__0R9f9dq30ZgYDGV6//8TFzxGvkzrzBgLNvWJruo7rEw');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
-(function () {
-  d.vector = '@xs = $0'.ctor ({
+d.rebase (function () {
+  var range = n >$> (--n > 0 ? range(n) << n : []);
+
+  var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0.xs[#{i}]')).join(join) + right).fn(),
+      componentwise = reduction.fn ('[', ']', ','),
+                dot = reduction.fn ('', '', '+', '*'),
+               four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
+  d.vector = range(6) * (n >$> '@xs = $0'.ctor (four (n), {dot: dot (n), '%': dot (n)}));
 }) ();
-__jI6607Mf8M/bPRVrZKtDPkLR0MX1HwkTGq84OZw8vEU
+__0R9f9dq30ZgYDGV6//8TFzxGvkzrzBgLNvWJruo7rEw
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
