@@ -520,7 +520,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
 
 __oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc
 
-meta::code('main', <<'__atqEoFpzGwIhdfSxpX+2gaIyUTWIF8+BH31TPxGEYdA');
+meta::code('main', <<'__qPJCD+oLZbI30mbpf46g3fKzPH/qJ/L31w+NiZEL4Jc');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -529,21 +529,21 @@ d.rebase (function () {
 
   var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0.xs[#{i}]')).join(join) + right).fn(),
       componentwise = reduction.fn ('new @constructor ([', '])', ','),
-           distance = reduction.fn ('Math.sqrt (', ')', '+', '*'),
-                dot = reduction.fn ('', '',             '+', '*'),
+           distance = _ >$> Math.sqrt (this % this),
+                dot = reduction.fn ('', '', '+', '*'),
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
-  d.vector = range(6) * (n >$> '@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), toString: _ >$> '<#{this.xs.join(", ")}>'}));
+  d.vector = range(6) * (n >$> '@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}));
 }) ();
-__atqEoFpzGwIhdfSxpX+2gaIyUTWIF8+BH31TPxGEYdA
+__qPJCD+oLZbI30mbpf46g3fKzPH/qJ/L31w+NiZEL4Jc
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
 :: get main
 __UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0
 
-meta::code('test', <<'__/MFPSqM8p077kaL91vW2Hc1PlJk5DKSY7OA+KgEPosU');
+meta::code('test', <<'__t0YLITAgWR+4gcugMh+7SNjBky0d9ReI5M011OPWwmU');
 Divergence vector geometry unit tests | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -551,15 +551,19 @@ Licensed under the terms of the MIT source code license
 :: get divergence-rebase-lib
 :: get main
 :: get test-utils
-__/MFPSqM8p077kaL91vW2Hc1PlJk5DKSY7OA+KgEPosU
 
-meta::code('test-utils', <<'__y0hvweWKk7wy9bm5fJfhHpJ0k7OOEIwhA2vuE7aAEEc');
+  var v2 = d.vector[2], v3 = d.vector[3];
+  print (new v2 ([1, 1]).distance());
+__t0YLITAgWR+4gcugMh+7SNjBky0d9ReI5M011OPWwmU
+
+meta::code('test-utils', <<'__vHMPwm2bWfqFiSYX8WWoHcUx7uYNcptZv4wupaGhbjo');
 Unit test utilities.
 
+  var print        = this.print || require('sys').puts;
   var assert       = function (x, msg) {if (! x) throw new Error ("Assertion failed: " + msg)};
   var assert_equal = function (x, y, msg) {x === y || assert (x === y, msg + ' -- ' + x.toString () + ' !== ' + y.toString ())};
   var trace        = function (x) {print (x); return x};
-__y0hvweWKk7wy9bm5fJfhHpJ0k7OOEIwhA2vuE7aAEEc
+__vHMPwm2bWfqFiSYX8WWoHcUx7uYNcptZv4wupaGhbjo
 
 meta::data('default-action', <<'__zmNcTqv/Xk9W26j7HjnKI1UwqitrGFM+7xrzhiAWxXc');
 shell
