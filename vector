@@ -282,7 +282,7 @@ var d = (function () {
 
 __NQWwvv7U4KX6W7COGyQapDozhkZ2Gjl81ClB+Wg6uBA
 
-meta::code('divergence-rebase-lib', <<'__9aky3h38GeCS8Ak+43Lu7UeH6Hl6H5mH6zIj4D8FUto');
+meta::code('divergence-rebase-lib', <<'__oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc');
 Divergence Rebase module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -483,7 +483,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
     that build strings. Unfortunately we won't be able to distinguish between single and double-quoted strings because SpiderMonkey converts them all to double-quoted ones.
 
           function (e) {return e.charAt && '\'"'.indexOf(e.charAt(0)) > -1 && /#\{[^}]+\}/.test(e) ?
-                               '(' + e.replace (/#\{([^}]+)\}/g, function (_, code) {return e.charAt(0) + '+(' + r.translate(code) + ')+' + e.charAt(0)}) + ')' : e},
+                               '(' + e.replace (/#\{([^}]+)\}/g, function (_, code) {return e.charAt(0) + '+(' + r.translate(code.replace(/\\(.)/g, '$1')) + ')+' + e.charAt(0)}) + ')' : e},
 
     Operator overloading.
     Once we're done with all of the preprocessing we can actually replace the operators with method calls. I'm cheating just a bit here; normally you would encase the operation inside a [ node
@@ -518,9 +518,9 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
 
   r.enable_inline_macro = (function (enabled) {return function () {enabled || (enabled = !! d.inline_macros.push ('$0.toString()'.compose (r.transform).compose (r.parse)))}}) (false)}) ();
 
-__9aky3h38GeCS8Ak+43Lu7UeH6Hl6H5mH6zIj4D8FUto
+__oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc
 
-meta::code('main', <<'__xWF2eLcDj7vIL69urm3ugHDwyrjqjCd1qrRzJDT6BYE');
+meta::code('main', <<'__atqEoFpzGwIhdfSxpX+2gaIyUTWIF8+BH31TPxGEYdA');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -529,14 +529,14 @@ d.rebase (function () {
 
   var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0.xs[#{i}]')).join(join) + right).fn(),
       componentwise = reduction.fn ('new @constructor ([', '])', ','),
-                dot = reduction.fn ('', '', '+', '*'),
            distance = reduction.fn ('Math.sqrt (', ')', '+', '*'),
+                dot = reduction.fn ('', '',             '+', '*'),
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
   d.vector = range(6) * (n >$> '@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), toString: _ >$> '<#{this.xs.join(", ")}>'}));
 }) ();
-__xWF2eLcDj7vIL69urm3ugHDwyrjqjCd1qrRzJDT6BYE
+__atqEoFpzGwIhdfSxpX+2gaIyUTWIF8+BH31TPxGEYdA
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
