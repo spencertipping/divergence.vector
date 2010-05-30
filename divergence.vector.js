@@ -11,5 +11,5 @@ d.rebase (function () {
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
-  d.vector = range(6) * (n >$> '@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}));
-}) ();
+  d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}),
+                                       {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();

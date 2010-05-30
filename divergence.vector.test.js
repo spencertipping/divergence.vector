@@ -313,8 +313,8 @@ d.rebase (function () {
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
-  d.vector = range(6) * (n >$> '@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}));
-}) ();
+  d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}),
+                                       {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();
 
 // Unit test utilities.
 
@@ -323,5 +323,5 @@ d.rebase (function () {
   var assert_equal = function (x, y, msg) {x === y || assert (x === y, msg + ' -- ' + x.toString () + ' !== ' + y.toString ())};
   var trace        = function (x) {print (x); return x};
 
-  var v2 = d.vector[2], v3 = d.vector[3];
-  print (new v2 ([1, 1]).distance());
+  var v2 = d.vector[2].create, v3 = d.vector[3].create;
+  print (v2 (1, 1).distance());
