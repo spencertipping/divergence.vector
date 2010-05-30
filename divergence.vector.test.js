@@ -53,8 +53,8 @@ var d = (function () {
   (d.functionals = [Array, Number, Boolean, Function, String, RegExp].map ('.prototype')).push (d.functional_extensions);
 
   d.functions ({
-      compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f (g.apply (this, arguments))}},
- flat_compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this, g.apply (this, arguments))}},
+      compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this, [g.apply (this, arguments)])}},
+ flat_compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this,  g.apply (this, arguments) )}},
         curry:  function (n) {var f = this.fn(); return n > 1 ? function () {var as = d.arr(arguments); return function () {return f.curry (n - 1).apply (this, as.concat (d.arr (arguments)))}} : f},
         proxy:  function (g) {var f = this.fn(); return g ? function () {return f.apply.apply (f, g.fn().apply (this, arguments))} : function () {return f.apply (this, arguments)}},
          bind:  function (x) {var f = this.fn(); return d.init (function () {return f.apply (x, arguments)}, {binding: x, original: f})},
@@ -306,12 +306,13 @@ var d = (function () {
 d.rebase (function () {
   var range = n >$> (n > 0 ? range(n - 1) << n - 1 : []);
 
-  var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0.xs[#{i}]')).join(join) + right).fn(),
+  var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0[#{i}]')).join(join) + right).fn(),
+              unify = n >$> (x >$> (x.constructor === Number ? range(n) * (_ >$> x) : x.xs ? x.xs : x)),
       componentwise = reduction.fn ('new @constructor ([', '])', ','),
            distance = _ >$> Math.sqrt (this % this),
-                dot = reduction.fn ('', '', '+', '*'),
+                dot = n >$> reduction ('', '', '+', '*', n).compose (unify (n)),
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
-               four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
+               four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n).compose (unify (n)))) / d.init;
 
   d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}),
                                        {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();

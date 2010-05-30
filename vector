@@ -215,7 +215,7 @@ something most people will normally do. In the future there may be a locking mec
 
 __3uM+GRhsAnxE6BFehM2nkGju4J93JQjqONxKbpE0Cdg
 
-meta::code('divergence-lib', <<'__NQWwvv7U4KX6W7COGyQapDozhkZ2Gjl81ClB+Wg6uBA');
+meta::code('divergence-lib', <<'__e82BUNz8qVKgCdqDK8vKnZiq7w5yJdCtLOFtfs1ZSDM');
 Divergence core library | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -268,8 +268,8 @@ var d = (function () {
   (d.functionals = [Array, Number, Boolean, Function, String, RegExp].map ('.prototype')).push (d.functional_extensions);
 
   d.functions ({
-      compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f (g.apply (this, arguments))}},
- flat_compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this, g.apply (this, arguments))}},
+      compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this, [g.apply (this, arguments)])}},
+ flat_compose:  function (g) {var f = this.fn(); g = g.fn(); return function () {return f.apply (this,  g.apply (this, arguments) )}},
         curry:  function (n) {var f = this.fn(); return n > 1 ? function () {var as = d.arr(arguments); return function () {return f.curry (n - 1).apply (this, as.concat (d.arr (arguments)))}} : f},
         proxy:  function (g) {var f = this.fn(); return g ? function () {return f.apply.apply (f, g.fn().apply (this, arguments))} : function () {return f.apply (this, arguments)}},
          bind:  function (x) {var f = this.fn(); return d.init (function () {return f.apply (x, arguments)}, {binding: x, original: f})},
@@ -280,7 +280,7 @@ var d = (function () {
 
   return d}) ();
 
-__NQWwvv7U4KX6W7COGyQapDozhkZ2Gjl81ClB+Wg6uBA
+__e82BUNz8qVKgCdqDK8vKnZiq7w5yJdCtLOFtfs1ZSDM
 
 meta::code('divergence-rebase-lib', <<'__oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc');
 Divergence Rebase module | Spencer Tipping <spencer@spencertipping.com>
@@ -520,23 +520,24 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
 
 __oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc
 
-meta::code('main', <<'__JPmz7tQ4wzXaJ+rov3vFKge02lHHacVcAIoMjeujDPU');
+meta::code('main', <<'__e1V8J53Ko/uJsDUCstpO+/o5yarUU/doyXRx+gLeCOs');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
 d.rebase (function () {
   var range = n >$> (n > 0 ? range(n - 1) << n - 1 : []);
 
-  var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0.xs[#{i}]')).join(join) + right).fn(),
+  var     reduction = (left, right, join, op, n) >$> (left + (range(n) * (i >$> '@xs[#{i}] #{op} $0[#{i}]')).join(join) + right).fn(),
+              unify = n >$> (x >$> (x.constructor === Number ? range(n) * (_ >$> x) : x.xs ? x.xs : x)),
       componentwise = reduction.fn ('new @constructor ([', '])', ','),
            distance = _ >$> Math.sqrt (this % this),
-                dot = reduction.fn ('', '', '+', '*'),
+                dot = n >$> reduction ('', '', '+', '*', n).compose (unify (n)),
             initial = n >$> '[' + (range(n) * (_ >$> 0)).join (',') + ']',
-               four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
+               four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n).compose (unify (n)))) / d.init;
 
   d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'%': dot (n), distance: distance, toString: _ >$> '<#{this.xs.join(", ")}>'}),
                                        {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();
-__JPmz7tQ4wzXaJ+rov3vFKge02lHHacVcAIoMjeujDPU
+__e1V8J53Ko/uJsDUCstpO+/o5yarUU/doyXRx+gLeCOs
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
