@@ -582,7 +582,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
 
 __oz350IDFkZ5OwrkPczNMgbDNZ6lO8qCAv/OplMnqEuc
 
-meta::code('main', <<'__z2uICuVNmn7lOM4RoplStPUPxD/HE2S3Z7QpQ97G0cE');
+meta::code('main', <<'__xAvv99AxOAdNFvlyvNkySYjXdjR4BIDy13Trnx7e0C0');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -597,17 +597,18 @@ d.rebase (function () {
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
   d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
-                                                                                    unit: _ >$> this / this.distance(),
-                                                                                    distance: _ >$> Math.sqrt (this % this), toString: _ >$> '<#{this.xs.join(", ")}>'}),
-                                       {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();
-__z2uICuVNmn7lOM4RoplStPUPxD/HE2S3Z7QpQ97G0cE
+                                                                                  unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
+                                                                              toString : _ >$> '<#{this.xs.join(", ")}>'}),
+                                       {create: 'new d.vector[#{n}] (@_)'.fn(),
+                                          from: 'new d.vector[#{n}] ([#{(range(n) * (i >$> arguments[0])).join(",")}])'.fn()}))}) ();
+__xAvv99AxOAdNFvlyvNkySYjXdjR4BIDy13Trnx7e0C0
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
 :: get main
 __UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0
 
-meta::code('test', <<'__EBlq/qsSmND1EEckOGDinsx8WT2hHjWWMlA60KzpSOY');
+meta::code('test', <<'__MHd8aXolJ3vBIDIlVTgznsXEYUEx+x45VO5FFrujJzs');
 Divergence vector geometry unit tests | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -626,10 +627,11 @@ Licensed under the terms of the MIT source code license
 
     var v2 = d.vector[2].create, v3 = d.vector[3].create;
     print (v2 (1, 1).distance());
-
     print (v3 (1, 1, 1) % 1);
+    print (v3 (1, 1, 1) + 1);
+    print (v3 (1, 1, 1) * v3 (1, 2, 3));
   }) ();
-__EBlq/qsSmND1EEckOGDinsx8WT2hHjWWMlA60KzpSOY
+__MHd8aXolJ3vBIDIlVTgznsXEYUEx+x45VO5FFrujJzs
 
 meta::code('test-utils', <<'__vHMPwm2bWfqFiSYX8WWoHcUx7uYNcptZv4wupaGhbjo');
 Unit test utilities.

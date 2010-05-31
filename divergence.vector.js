@@ -12,6 +12,7 @@ d.rebase (function () {
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
   d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
-                                                                                    unit: _ >$> this / this.distance(),
-                                                                                    distance: _ >$> Math.sqrt (this % this), toString: _ >$> '<#{this.xs.join(", ")}>'}),
-                                       {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();
+                                                                                  unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
+                                                                              toString : _ >$> '<#{this.xs.join(", ")}>'}),
+                                       {create: 'new d.vector[#{n}] (@_)'.fn(),
+                                          from: 'new d.vector[#{n}] ([#{(range(n) * (i >$> arguments[0])).join(",")}])'.fn()}))}) ();

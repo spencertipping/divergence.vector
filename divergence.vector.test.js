@@ -376,9 +376,10 @@ d.rebase (function () {
                four = n >$> '+-*/'.split('') * (op >$> op.maps_to (componentwise (op, n))) / d.init;
 
   d.vector = range(6) * (n >$> d.init ('@xs = $0 || #{initial(n)}'.ctor (four (n), {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
-                                                                                    unit: _ >$> this / this.distance(),
-                                                                                    distance: _ >$> Math.sqrt (this % this), toString: _ >$> '<#{this.xs.join(", ")}>'}),
-                                       {create: 'new d.vector[#{n}] (@_)'.fn()}))}) ();
+                                                                                  unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
+                                                                              toString : _ >$> '<#{this.xs.join(", ")}>'}),
+                                       {create: 'new d.vector[#{n}] (@_)'.fn(),
+                                          from: 'new d.vector[#{n}] ([#{(range(n) * (i >$> arguments[0])).join(",")}])'.fn()}))}) ();
 
 // Unit test utilities.
 
@@ -392,6 +393,7 @@ d.rebase (function () {
 
     var v2 = d.vector[2].create, v3 = d.vector[3].create;
     print (v2 (1, 1).distance());
-
     print (v3 (1, 1, 1) % 1);
+    print (v3 (1, 1, 1) + 1);
+    print (v3 (1, 1, 1) * v3 (1, 2, 3));
   }) ();
