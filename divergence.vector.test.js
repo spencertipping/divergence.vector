@@ -98,7 +98,7 @@ var d = (function () {
                    unary: set(qw('u++ u-- ++ -- u+ u- u! u~ new typeof var case try finally throw return case else delete void import export ( [ { ?:')),
                syntactic: set(qw('case var if while for do switch return throw delete export import try catch finally void with else function new typeof in instanceof')),
                statement: set(qw('case var if while for do switch return throw delete export import try catch finally void with else')),
-               connected: set(qw('else catch finally')),
+               connected: set(qw('else catch finally')),                                                                       digit: set('0123456789.'.split('')),
                    ident: set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_'.split ('')),                  punct: set('+-*/%&|^!~=<>?:;.,'.split ('')),
                    right: set(qw('= += -= *= /= %= &= ^= |= <<= >>= >>>= u~ u! new typeof u+ u- u++ u-- ++ --')),            openers: {'(':')', '[':']', '{':'}', '?':':'},
      implicit_assignment: set(qw('++ -- u++ u--')),                                                                       sandwiches: set(qw('$ $$ $$$ _ __ ___ _$ _$$ __$')),
@@ -110,6 +110,7 @@ var d = (function () {
                 alias_in: '$0.init ($1, $0.map ($2, {|h, k, v| k.maps_to (h[v] || v.fn()) |}.fn($1)))'.fn(d),
 
                     init: '$0.deparse($0.transform($0.parse($1)))'.fn(r),
+                   local: '$0.transform($0.parse($1)).toString()'.fn(r),
 
 //   Deparsing.
 //   This is certainly the easiest part. All we have to do is follow some straightforward rules about how operators and such get serialized. Luckily this is all encapsulated into the toString
@@ -142,7 +143,7 @@ var d = (function () {
 
                    parse: function (s) {var mark = 0, s = s.toString(), i = 0, $_ = '', l = s.length, token = '', expect_re = true, escaped = false, t = new r.syntax(null, '('),
                                                       c = s.charAt.bind (s), openers = [],
-                                             precedence = r.precedence, ident = r.ident, punct = r.punct,
+                                             precedence = r.precedence, ident = r.ident, punct = r.punct, digit = r.digit,
                                             line_breaks = [0].concat (s.split('\n').map('.length')), lb = 1,
                                           located_token = function () {var jump = lb << 1, l = 0, r = new String (token);
                                                                        while (jump >>= 1) mark >= line_breaks[l + jump] && (l += jump);
@@ -153,17 +154,17 @@ var d = (function () {
                           while ((mark = i) < l && ($_ = c(i))) {
           escaped = token = '';
 
-               if                                (' \n\r\t'.indexOf ($_) > -1)                                                       {++i; continue}
-          else if                               ('([{?:}])'.indexOf ($_) > -1)                                                        expect_re = '([{:?'.indexOf ($_) > -1, ++i;
-          else if                 ($_ === '/' && c(i + 1) === '*' && (i += 2)) {while (c(++i) !== '/' || c(i - 1) !== '*' || ! ++i);  continue}
-          else if                             ($_ === '/' && c(i + 1) === '/') {while       (($_ = c(++i)) !== '\n' && $_ !== '\r');  continue}
-          else if ($_ === '/' && expect_re && ! (expect_re = ! (token = '/'))) {while            (($_ = c(++i)) !== '/' || escaped)   escaped = ! escaped && $_ === '\\';
-                                                                                while                               (ident[c(++i)]);}
-          else if              ($_ === '"' && ! (expect_re = ! (token = '"')))  while   (($_ = c(++i)) !== '"' || escaped || ! ++i)   escaped = ! escaped && $_ === '\\';
-          else if              ($_ === "'" && ! (expect_re = ! (token = "'")))  while   (($_ = c(++i)) !== "'" || escaped || ! ++i)   escaped = ! escaped && $_ === '\\';
-          else if                    (expect_re && punct[$_] && (token = 'u'))  while  (punct[$_ = c(i)] && precedence[token + $_])   token += $_, ++i;
-          else if                            (punct[$_] && (expect_re = true))  while  (punct[$_ = c(i)] && precedence[token + $_])   token += $_, ++i;
-          else                                                                 {while                               (ident[c(++i)]);  expect_re = precedence.hasOwnProperty (token = s.substring(mark, i))}
+               if                                (' \n\r\t'.indexOf ($_) > -1)                                                             {++i; continue}
+          else if                               ('([{?:}])'.indexOf ($_) > -1)                                                              expect_re = '([{:?'.indexOf ($_) > -1, ++i;
+          else if                 ($_ === '/' && c(i + 1) === '*' && (i += 2)) {while       (c(++i) !== '/' || c(i - 1) !== '*' || ! ++i);  continue}
+          else if                             ($_ === '/' && c(i + 1) === '/') {while             (($_ = c(++i)) !== '\n' && $_ !== '\r');  continue}
+          else if ($_ === '/' && expect_re && ! (expect_re = ! (token = '/'))) {while                  (($_ = c(++i)) !== '/' || escaped)   escaped = ! escaped && $_ === '\\';
+                                                                                while                                     (ident[c(++i)]);}
+          else if              ($_ === '"' && ! (expect_re = ! (token = '"')))  while         (($_ = c(++i)) !== '"' || escaped || ! ++i)   escaped = ! escaped && $_ === '\\';
+          else if              ($_ === "'" && ! (expect_re = ! (token = "'")))  while         (($_ = c(++i)) !== "'" || escaped || ! ++i)   escaped = ! escaped && $_ === '\\';
+          else if                    (expect_re && punct[$_] && (token = 'u'))  while        (punct[$_ = c(i)] && precedence[token + $_])   token += $_, ++i;
+          else if                            (punct[$_] && (expect_re = true))  while        (punct[$_ = c(i)] && precedence[token + $_])   token += $_, ++i;
+          else                                                                 {while (ident[$_ = c(++i)] || digit[c(mark)] && digit[$_]);  expect_re = precedence.hasOwnProperty (token = s.substring (mark, i))}
 
           expect_re && token.charAt(0) === 'u' || (token = s.substring (mark, i));
           token in {} && (token = '@' + token);
@@ -359,6 +360,13 @@ d.rebase (function () {
                                          trace: e >$> (this.predicate(e) && d.trace(e)),
                                            log: e >$> (e ? this.events << e : this.events.to_array())})})}) ();
 
+// Unit test utilities.
+
+  var print        = this.print || require('sys').puts;
+  var assert       = function (x, msg) {if (! x) throw new Error ("Assertion failed: " + msg)};
+  var assert_equal = function (x, y, msg) {x === y || assert (x === y, msg + ' -- ' + x.toString () + ' !== ' + y.toString ())};
+  var trace        = function (x) {print (x); return x};
+
   d.tracer = this.print || require('sys').puts;
   var w = new d.debug.watcher();
 
@@ -377,18 +385,16 @@ d.rebase (function () {
 
   d.vector = range(6) * (n >$> d.init (constructor(n).ctor (four (n),
                                                             {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
+                                                        towards : (v, x) >$> this * (1.0 - x) + v * x,
                                                            unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
+                                                           into : _ >$> this.constructor.create.apply (this, range(arguments.length) * (i >$> this % arguments[i].unit())),
+                                                           from : _ >$> range(arguments.length) * (i >$> arguments[i] * this[i]) / ((x, y) >$> x + y),
                                                        toString : _ >$> '<#{Array.prototype.join.call(this, ", ")}>'}),
                                        {create: 'new d.vector[#{n}] (#{(range(n) * (i >$> "$" + i)).join(",")})'.fn()}));
   var v3 = d.vector[3];
-  d.init (v3.prototype, {'^': v >$> new v3 (this[1] * v[2] - this[2] * v[1], this[2] * v[0] - this[0] * v[2], this[0] * v[1] - this[1] * v[0])})}) ();
-
-// Unit test utilities.
-
-  var print        = this.print || require('sys').puts;
-  var assert       = function (x, msg) {if (! x) throw new Error ("Assertion failed: " + msg)};
-  var assert_equal = function (x, y, msg) {x === y || assert (x === y, msg + ' -- ' + x.toString () + ' !== ' + y.toString ())};
-  var trace        = function (x) {print (x); return x};
+  d.init (v3.prototype, {'^': v >$> new v3 (this[1] * v[2] - this[2] * v[1], this[2] * v[0] - this[0] * v[2], this[0] * v[1] - this[1] * v[0]),
+                      about : function (v, angle) {var b1 = v.unit(), o = this | b1, b2 = o.unit(), b3 = b1 ^ b2, l = o.distance();
+                                                   return (this & b1) + b2 * (Math.cos(angle) * l) + b3 * (Math.sin(angle) * l)}})}) ();
 
   d.rebase (function () {
     w.use_tracing ();

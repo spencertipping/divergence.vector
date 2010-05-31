@@ -13,8 +13,13 @@ d.rebase (function () {
 
   d.vector = range(6) * (n >$> d.init (constructor(n).ctor (four (n),
                                                             {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
+                                                        towards : (v, x) >$> this * (1.0 - x) + v * x,
                                                            unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
+                                                           into : _ >$> this.constructor.create.apply (this, range(arguments.length) * (i >$> this % arguments[i].unit())),
+                                                           from : _ >$> range(arguments.length) * (i >$> arguments[i] * this[i]) / ((x, y) >$> x + y),
                                                        toString : _ >$> '<#{Array.prototype.join.call(this, ", ")}>'}),
                                        {create: 'new d.vector[#{n}] (#{(range(n) * (i >$> "$" + i)).join(",")})'.fn()}));
   var v3 = d.vector[3];
-  d.init (v3.prototype, {'^': v >$> new v3 (this[1] * v[2] - this[2] * v[1], this[2] * v[0] - this[0] * v[2], this[0] * v[1] - this[1] * v[0])})}) ();
+  d.init (v3.prototype, {'^': v >$> new v3 (this[1] * v[2] - this[2] * v[1], this[2] * v[0] - this[0] * v[2], this[0] * v[1] - this[1] * v[0]),
+                      about : function (v, angle) {var b1 = v.unit(), o = this | b1, b2 = o.unit(), b3 = b1 ^ b2, l = o.distance();
+                                                   return (this & b1) + b2 * (Math.cos(angle) * l) + b3 * (Math.sin(angle) * l)}})}) ();
