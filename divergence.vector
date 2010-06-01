@@ -50,16 +50,17 @@ meta::define_form 'code', sub {
 };
 __VqQsjlm+HucvTRVlIGc8oi++EzzNq+rwy5bhKzunE8A
 
-meta::meta('datatypes::data', <<'__j7lFraXGRfKk8ymj2mDJhNbCQMk9FSciN1hdDhzM99U');
+meta::meta('datatypes::data', <<'__s2euAFkA/SbXvMzOkLZXrqX3TdtBzEODSWBAt7wXECA');
 meta::define_form 'data', sub {
   my ($name, undef) = @_;
   $externalized_functions{$name} = "data::$name";
   *{$name} = sub {
     associate("data::$name", $_[1] || join('', <STDIN>)) if @_ > 0 && $_[0] eq '=';
+    edit("data::$name")                                  if $_[0] eq 'edit';
     retrieve("data::$name");
   };
 };
-__j7lFraXGRfKk8ymj2mDJhNbCQMk9FSciN1hdDhzM99U
+__s2euAFkA/SbXvMzOkLZXrqX3TdtBzEODSWBAt7wXECA
 
 meta::meta('datatypes::function', <<'__XSIHGGHv0Sh0JBj9KIrP/OzuuB2epyvn9pgtZyWE6t0');
 meta::define_form 'function', sub {
@@ -111,6 +112,19 @@ meta::define_form '_list_type', sub {
   };
 };
 __OKczvJ+6wi8VPNFcZ9ohlXjw+ychodWCfcELdli9p+w
+
+meta::meta('datatypes::message-color', <<'__nWmJgsP4S3LFdMPQnL+foYc9c5fgqIlEm6RppolzoX0');
+meta::define_form 'message_color', sub {
+  my ($name, $value) = @_;
+  $externalized_functions{$name} = "message_color::$name";
+  terminal::color($name, $value);
+  *{$name} = sub {
+    associate("message_color::$name", $_[1] || join('', <STDIN>)) if @_ > 0 && $_[0] eq '=';
+    edit("message_color::$name")                                  if $_[0] eq 'edit';
+    retrieve("message_color::$name");
+  };
+};
+__nWmJgsP4S3LFdMPQnL+foYc9c5fgqIlEm6RppolzoX0
 
 meta::meta('datatypes::note', <<'__TGOjJwmj+QJp1giUQqg2bEaQe8RvqnrFEqyZhIpSC34');
 meta::define_form 'note', sub {
@@ -215,69 +229,7 @@ something most people will normally do. In the future there may be a locking mec
 
 __3uM+GRhsAnxE6BFehM2nkGju4J93JQjqONxKbpE0Cdg
 
-meta::code('divergence-debug-lib', <<'__KKdGH4rPdpeIqqzXZFk/H8ezofxu+e+VklQwf620sfg');
-Divergence debug module | Spencer Tipping <spencer@spencertipping.com>
-Licensed under the terms of the MIT source code license
-
-This debug module enables expression-level debugging and tracing for functions. It records history (controlled by history-recording commands) and lets you replay sequences of events or
-systematically search through them. Note that this can be arbitrarily memory-intensive; recording every single expression that goes through a system is an expensive way to debug things. To
-compensate, there are calls you can make to start and stop tracing as your program is running. You can also set triggers depending on program values and use a sliding window.
-
-The idea here is that a program evaluates expressions to achieve things. If we have a record of those evaluations, we can mostly reconstruct what the program was doing.
-
-d.rebase (function () {
-  var t = d.debug = _ >$> d.debug.init (this, arguments), global = this, syn = x >$> new d.rebase.syntax(null, x),
-    set = xs >$> xs * '$0.maps_to(true)'.fn() / d.init, qw = s >$> s.split(/\s+/), qs = set.compose(qw);
-
-  d.functions ({traced: function (options) {var f = this.fn(), options = options || {}, tracer = options.tracer || d.trace, name = options.name || 'anonymous', count = 0;
-                                            return d.init (function () {var c = ++count;
-                                                                        tracer ('#{name} (#{c}) called on #{this} with [#{Array.prototype.slice.call (arguments).join (", ")}]');
-                                                                        try       {var result = f.apply (this, arguments); tracer ('#{name} (#{c}) returned #{result}'); return result}
-                                                                        catch (e) {tracer ('#{name} (#{c}) threw #{e}'); throw e}},
-                                                           {original: f})}});
-
-  d.init (t, {ring_buffer: '@size = $0, @elements = $1 || [], @position = -1'.fn().ctor ({'<<': '@elements[@position = @position + 1 % @size] = $0, $_'.fn(),
-                                                                                    'to_array': '@elements.slice(@position + 1).concat (@elements.slice(0, @position + 1))'.fn()}),
-                 reserved:  qs('break continue default'),   first_only: qs('.'),
-                     stop:  qs('++ -- u++ u-- new'),       second_only: qs('function catch = : += -= *= /= %= ^= |= &= <<= >>= >>>= in'),
-                     skip:  qs('{ ( [ , ; ?: case var if while for do switch return throw delete export import try catch finally void with else'),
-        protected_resolve:  qs('[! .'),
-
-                    event: '@node = $0, @value = $1, @time = new Date()'.ctor ({toString: _ >$> '(#{this.node}) = (#{this.value}) at #{this.time.getTime()}'}),
-
-                  watcher: '@name = d.gensym("hook"), @events = new $0.ring_buffer($1 && $1.log_size || 10000), @predicate = $1 && $1.predicate || (0).fn()'.fn(t).ctor ({
-                                   use_logging: _ >$> (global[this.name] = this.hook_function (this.log.bind   (this))),
-                                   use_tracing: p >$> (this.predicate = p || this.predicate, global[this.name] = this.hook_function (this.trace.bind (this))),
-                            remove_global_hook: function () {delete global[this.name]; this.installed_hook = null; return this},
-
-                                 hook_function: destination >$> ((index, value) >$> (destination (new t.event (this.trace_points[index], value)), value)).bind (this),
-
-                                 annotate_tree: function (v) {global[this.name] || (this.installed_hook = this.use_logging());
-                                                              var $_ = this,  trace_points = this.trace_points = this.trace_points || [],
-                                                                             annotate_node = (s, v) >$> syn('(!') << $_.name << (syn('(') << (syn(',') << (trace_points.push(s) - 1) << v)),
-                                                                         annotate_children =     v  >$> (v.xs ? (v.xs * annotate_tree).fold ((x, y) >$> x << y, syn(v.op)) : v),
-                                                                             annotate_tree =     v  >$> (! v || t.reserved[v] ? v :
-                                                                                                                 t.stop[v.op] ? annotate_node(v, v) :
-                                                                                                                 t.skip[v.op] ? annotate_children(v) :
-                                                                                                           t.first_only[v.op] ? syn(v.op) << annotate_tree(v.xs[0]) << v.xs[1] :
-                                                                                                          t.second_only[v.op] ? syn(v.op) << v.xs[0] << annotate_tree(v.xs[1]) :
-                                                                   v.op == '(!' && v.xs[0] && t.protected_resolve[v.xs[0].op] ? annotate_node (v,
-                                                                                                                                  syn(v.op) << (syn(v.xs[0].op) << annotate_tree(v.xs[0].xs[0]) <<
-                                                                                                                                                                   v.xs[0].xs[1]) <<
-                                                                                                                                               annotate_tree (v.xs[1])) :
-                                                                                                                       ! v.xs ? /^@?[A-Za-z_$][A-Za-z0-9_$]*$/.test(v) ? annotate_node(v, v) : v :
-                                                                                                                                annotate_node (v, annotate_children (v)));
-                                                              return annotate_tree (v)},
-
-                                      annotate: f >$> d.rebase.deparse (this.annotate_local (f)),
-                                annotate_local: f >$> this.annotate_tree (d.rebase.parse (f)).toString(),
-
-                                         trace: e >$> (this.predicate(e) && d.trace(e)),
-                                           log: e >$> (e ? this.events << e : this.events.to_array())})})}) ();
-
-__KKdGH4rPdpeIqqzXZFk/H8ezofxu+e+VklQwf620sfg
-
-meta::code('divergence-lib', <<'__e82BUNz8qVKgCdqDK8vKnZiq7w5yJdCtLOFtfs1ZSDM');
+meta::code('divergence-lib', <<'__Yc/lE4RVUaVU5TvaEVkhPAoJJIUR5Xd8GZWRhth5FKM');
 Divergence core library | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -336,15 +288,78 @@ var d = (function () {
         proxy:  function (g) {var f = this.fn(); return g ? function () {return f.apply.apply (f, g.fn().apply (this, arguments))} : function () {return f.apply (this, arguments)}},
          bind:  function (x) {var f = this.fn(); return d.init (function () {return f.apply (x, arguments)}, {binding: x, original: f})},
          type:  function  () {var f = function () {}, c = this.fn(); f = f.ctor.apply (f, arguments); return function () {return c.apply (new f(), arguments)}},
-         ctor:  function  () {var f = this.fn(), g = function () {f.apply (this, arguments)}; d.init.apply (this, [g.prototype].concat (d.arr (arguments))); return g},
+         ctor:  function  () {var g = function () {f.apply (this, arguments)}, f = g.original = this.fn(); d.init.apply (this, [g.prototype].concat (d.arr (arguments))); return g},
          tail: '[$_.fn(), arguments]'.fn(),
           cps:  function (c) {var cc = [this.fn(), [c = (c || d.id).fn().proxy()]]; while (cc[0] !== c) cc = cc[0].fn().apply (this, cc[1]); return c.apply (this, cc[1])}});
 
   return d}) ();
+__Yc/lE4RVUaVU5TvaEVkhPAoJJIUR5Xd8GZWRhth5FKM
 
-__e82BUNz8qVKgCdqDK8vKnZiq7w5yJdCtLOFtfs1ZSDM
+meta::code('divergence.debug-lib', <<'__IbEq7gdSZ+sPuz9b2mjJQ0OI//QELOwMMFQox4+/5uY');
+Divergence debug module | Spencer Tipping <spencer@spencertipping.com>
+Licensed under the terms of the MIT source code license
 
-meta::code('divergence-rebase-lib', <<'__lPvn2ulqyh2jRclFx8J78oMmNT4O0ByuDfTdETmYA8c');
+This debug module enables expression-level debugging and tracing for functions. It records history (controlled by history-recording commands) and lets you replay sequences of events or
+systematically search through them. Note that this can be arbitrarily memory-intensive; recording every single expression that goes through a system is an expensive way to debug things. To
+compensate, there are calls you can make to start and stop tracing as your program is running. You can also set triggers depending on program values and use a sliding window.
+
+The idea here is that a program evaluates expressions to achieve things. If we have a record of those evaluations, we can mostly reconstruct what the program was doing.
+
+d.rebase (function () {
+  var t = d.debug = _ >$> d.debug.init (this, arguments), global = this, syn = x >$> new d.rebase.syntax(null, x),
+    set = xs >$> xs * '$0.maps_to(true)'.fn() / d.init, qw = s >$> s.split(/\s+/), qs = set.compose(qw);
+
+  d.functions ({traced: function (options) {var f = this.fn(), options = options || {}, tracer = options.tracer || d.trace, name = options.name || 'anonymous', count = 0;
+                                            return d.init (function () {var c = ++count;
+                                                                        tracer ('#{name} (#{c}) called on #{this} with [#{Array.prototype.slice.call (arguments).join (", ")}]');
+                                                                        try       {var result = f.apply (this, arguments); tracer ('#{name} (#{c}) returned #{result}'); return result}
+                                                                        catch (e) {tracer ('#{name} (#{c}) threw #{e}'); throw e}},
+                                                           {original: f})}});
+
+  d.init (t, {ring_buffer: '@size = $0, @elements = $1 || [], @position = -1'.fn().ctor ({'<<': '@elements[@position = @position + 1 % @size] = $0, $_'.fn(),
+                                                                                    'to_array': '@elements.slice(@position + 1).concat (@elements.slice(0, @position + 1))'.fn()}),
+                 reserved:  qs('break continue default'),   first_only: qs('.'),
+                     stop:  qs('++ -- u++ u-- new'),       second_only: qs('function catch = : += -= *= /= %= ^= |= &= <<= >>= >>>= in'),
+                     skip:  qs('{ ( [ , ; ?: case var if while for do switch return throw delete export import try catch finally void with else'),
+        protected_resolve:  qs('[! .'),
+
+                    event: '@node = $0, @value = $1, @time = new Date()'.ctor ({toString: _ >$> '(#{this.node}) = (#{this.value}) at #{this.time.getTime()}'}),
+
+                    trace: (p, f) >$> new t.watcher().use_tracing(f && p).annotate (f || p),
+
+                  watcher: '@name = d.gensym("hook"), @events = new $0.ring_buffer($1 && $1.log_size || 10000), @predicate = $1 && $1.predicate || (0).fn()'.fn(t).ctor ({
+                                   use_logging: _ >$> (global[this.name] = this.hook_function (this.log.bind (this)), this),
+                                   use_tracing: p >$> (this.predicate = p || this.predicate, global[this.name] = this.hook_function (this.trace.bind (this)), this),
+                            remove_global_hook: function () {delete global[this.name]; this.installed_hook = null; return this},
+
+                                 hook_function: destination >$> ((index, value) >$> (destination (new t.event (this.trace_points[index], value)), value)).bind (this),
+
+                                 annotate_tree: function (v) {global[this.name] || (this.installed_hook = this.use_logging());
+                                                              var $_ = this,  trace_points = this.trace_points = this.trace_points || [],
+                                                                             annotate_node = (s, v) >$> syn('(!') << $_.name << (syn('(') << (syn(',') << (trace_points.push(s) - 1) << v)),
+                                                                         annotate_children =     v  >$> (v.xs ? (v.xs * annotate_tree).fold ((x, y) >$> x << y, syn(v.op)) : v),
+                                                                             annotate_tree =     v  >$> (! v || t.reserved[v] ? v :
+                                                                                                                 t.stop[v.op] ? annotate_node(v, v) :
+                                                                                                                 t.skip[v.op] ? annotate_children(v) :
+                                                                                                           t.first_only[v.op] ? syn(v.op) << annotate_tree(v.xs[0]) << v.xs[1] :
+                                                                                                          t.second_only[v.op] ? syn(v.op) << v.xs[0] << annotate_tree(v.xs[1]) :
+                                                                   v.op == '(!' && v.xs[0] && t.protected_resolve[v.xs[0].op] ? annotate_node (v,
+                                                                                                                                  syn(v.op) << (syn(v.xs[0].op) << annotate_tree(v.xs[0].xs[0]) <<
+                                                                                                                                                                   v.xs[0].xs[1]) <<
+                                                                                                                                               annotate_tree (v.xs[1])) :
+                                                                                                                       ! v.xs ? /^@?[A-Za-z_$][A-Za-z0-9_$]*$/.test(v) ? annotate_node(v, v) : v :
+                                                                                                                                annotate_node (v, annotate_children (v)));
+                                                              return annotate_tree (v)},
+
+                                      annotate: f >$> d.rebase.deparse (this.annotate_local (f)),
+                                annotate_local: f >$> this.annotate_tree (d.rebase.parse (f)).toString(),
+
+                                         trace: e >$> (this.predicate(e) && d.trace(e)),
+                                           log: e >$> (e ? this.events << e : this.events.to_array())})})}) ();
+
+__IbEq7gdSZ+sPuz9b2mjJQ0OI//QELOwMMFQox4+/5uY
+
+meta::code('divergence.rebase-lib', <<'__iKLvuhGP+fVGDbBgwvx39uaPFG620YzJkcfaMGctVrg');
 Divergence Rebase module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -386,6 +401,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
            prefix_binary: set(qw('if function catch for switch with while')),                                                closers: {')':'(', ']':'[', '}':'{', ':':'?:'},
             translations: {'u+':'+', 'u-':'-', 'u~':'~', 'u!':'!', 'u--':'--', 'u++':'++'},                                 arity_of: '$0.unary[$1] ? 1 : $1 == "?" ? 3 : 2'.fn(r),
            lvalue_assign: set(qw('+= -= *= /= %= ^= |= &= <<= >>= >>>=')),                                            should_convert: '! ($0.literal[$1] || $0.syntactic[$1])'.fn(r),
+               no_spaces: set(qw('.')),
 
                 alias_in: '$0.init ($1, $0.map ($2, {|h, k, v| k.maps_to (h[v] || v.fn()) |}.fn($1)))'.fn(d),
 
@@ -492,6 +508,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
                                              this.xs[1] && r.connected[this.xs[1].op] ? (($_ = s(this.xs[0])).charAt($_.length - 1) === '}' ? $_ + ' ' : $_ + ';') + s(this.xs[1]) :
                                                                      r.unary[this.op] ? (r.translations[this.op] || this.op) + ' ' + s(this.xs[0]) :
                                                              r.prefix_binary[this.op] ? this.op + ' ' + s(this.xs[0]) + ' ' + s(this.xs[1]) :
+                                                                 r.no_spaces[this.op] ? s(this.xs[0]) + this.op + s(this.xs[1]) :
                                                                                         s(this.xs[0]) + ' ' + this.op + ' ' + s(this.xs[1])}}),
 
   Macro support.
@@ -533,6 +550,15 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
 
           function (e) {return e.op == '>$>' ? new r.syntax(e.parent, 'function').with_node (e.xs[0].op == '(' ? e.xs[0] : new r.syntax (null, '(', [e.xs[0]])).
                                                                                   with_node (new r.syntax (null, '{').with_node (new r.syntax (null, 'return').with_node (e.xs[1]))) : e},
+
+    Function preloading.
+    Since Rebase doesn't provide an expression-mode variable binding syntax (this would be difficult), binding variables becomes a matter of using functions. This has the advantage that you
+    end up with a proper lexical scope too.
+
+      | x |$> f === f(x)
+      | (x, y) |$> f === f (x, y)
+
+          function (e) {return e.op == '|$>' ? new r.syntax(e.parent, '(!').with_node (e.xs[1]).with_node (e.xs[0].op == '(' ? e.xs[0] : new r.syntax(null, '(').with_node (e.xs[0])) : e},
 
     Comments.
     Structural comments can be useful for removing chunks of code or for getting comments through SpiderMonkey's parse-deparse cycle (SpiderMonkey, and perhaps other JS interpreters, removes
@@ -580,8 +606,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
   enable it like this:
 
   r.enable_inline_macro = (function (enabled) {return function () {enabled || (enabled = !! d.inline_macros.push ('$0.toString()'.compose (r.transform).compose (r.parse)))}}) (false)}) ();
-
-__lPvn2ulqyh2jRclFx8J78oMmNT4O0ByuDfTdETmYA8c
+__iKLvuhGP+fVGDbBgwvx39uaPFG620YzJkcfaMGctVrg
 
 meta::code('main', <<'__xjXfDuZA4uH51jJ8uCH/+lHXNniKYqIA7vI7LxmA1QA');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
@@ -616,13 +641,13 @@ This is for scratchwork that isn't part of your system. It could be used for tes
 :: get main
 __UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0
 
-meta::code('test', <<'__pGKs6Tc1ijXNeS/2jVVDvrC7maCzDChmqdCTRiF2yf4');
+meta::code('test', <<'__pwTXDQluyEgZaWVL02e9YZR1dxax5OXwmn5FqQWgPoI');
 Divergence vector geometry unit tests | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
 :: get divergence-lib
-:: get divergence-rebase-lib
-:: get divergence-debug-lib
+:: get divergence.rebase-lib
+:: get divergence.debug-lib
 
 :: get test-utils
 
@@ -640,7 +665,7 @@ Licensed under the terms of the MIT source code license
     print (v3 (1, 1, 1) + 1);
     print (v3 (1, 1, 1) * v3 (1, 2, 3));
   }) ();
-__pGKs6Tc1ijXNeS/2jVVDvrC7maCzDChmqdCTRiF2yf4
+__pwTXDQluyEgZaWVL02e9YZR1dxax5OXwmn5FqQWgPoI
 
 meta::code('test-utils', <<'__vHMPwm2bWfqFiSYX8WWoHcUx7uYNcptZv4wupaGhbjo');
 Unit test utilities.
@@ -664,9 +689,9 @@ meta::data('meta-associations', <<'__PRn3E4sEYBafwIXKC61VRabCemMeSeRn2H7z3wLgOo4
 ^vim_highlighter:: .vim
 __PRn3E4sEYBafwIXKC61VRabCemMeSeRn2H7z3wLgOo4
 
-meta::data('name', <<'__sNUcWMi5wfRY+t8Wx9N1Yw71HaTfgZFYk7BcD6Tti8Y');
-vector
-__sNUcWMi5wfRY+t8Wx9N1Yw71HaTfgZFYk7BcD6Tti8Y
+meta::data('name', <<'__T02pZyykSo7WsnkmWwhR/b8uO7G+Hqg9E7O8mtLcI9M');
+divergence.vector
+__T02pZyykSo7WsnkmWwhR/b8uO7G+Hqg9E7O8mtLcI9M
 
 meta::function('add-to', <<'__KBgra0vG1gIsUI8CCVf4ZEdCatZDCdVO6HuUx+jOJ9Q');
 my ($filename) = @_;
@@ -707,10 +732,10 @@ meta::function('code', <<'__NBNecoJ9JVwyGbA+8LrNYjQKQyQOxdFAkjgZ4ueT5QA');
 join "\n\n", map preprocess(retrieve("code::$_")), @_;
 __NBNecoJ9JVwyGbA+8LrNYjQKQyQOxdFAkjgZ4ueT5QA
 
-meta::function('compile', <<'__617hUKCip9P2qNUTBGfmRZThDansP8hf8tkWTQOV9/c');
-file::write('divergence.vector.js', unlit('main'));
-file::write('divergence.vector.test.js', unlit('test'));
-__617hUKCip9P2qNUTBGfmRZThDansP8hf8tkWTQOV9/c
+meta::function('compile', <<'__fS4SFKwDwlQRAPgdkfOItg4KJJn5c4BwZzQkiAe8Kvc');
+my $name = name();
+file::write("$name.js", unlit('main'));
+__fS4SFKwDwlQRAPgdkfOItg4KJJn5c4BwZzQkiAe8Kvc
 
 meta::function('cp', <<'__yn1SQkcEk6o+gnuCy3QGVFtQb2piaCoUdJPGUkLjpD4');
 my ($from, $to) = @_;
@@ -729,6 +754,17 @@ if ($value) {
   edit ($name);
 }
 __YDNTuzkJSNUIk4tbdwxep6/rT8uGnceIj7rljM9gusc
+
+meta::function('deps', <<'__SZ4U6b8mZigWcPg3LLsBHJGEgtUKpWe3Pvy87e88W2E');
+&{'push-state'}();
+terminal::message('info', 'The old state of this object is being preserved. Run pop-state to revert after this import is complete.');
+for (grep length && ! /^#/, split /\n/, dependencies()) {
+  my ($name, $attribute) = split;
+  (my $processed_name = $name) =~ s/^\.\///;
+  terminal::message('status', "Importing $attribute from $name as $processed_name-lib");
+  associate("code::$processed_name-lib", join('', qx/$name cat code::$attribute/));
+}
+__SZ4U6b8mZigWcPg3LLsBHJGEgtUKpWe3Pvy87e88W2E
 
 meta::function('edit', <<'__rAkSOSll0evjt/D0qmnz2M++ACqz6cPtN8TLTHdQUJE');
 my ($name, %options) = @_;
@@ -1067,12 +1103,12 @@ reload();
 terminal::message('info', "Imported from $_[0]. Run pop-state to undo this change.");
 __jJ2tfSk/Quz8/1PiYxIwQjBRt/hYg51iJhAdxcdaHkM
 
-meta::function('usage', <<'__oHVev4RtZlF/82SSE87y4Bf7ran2afn/HDtukOQBf9I');
-<<"EOD" . join '  ', split /\n/, ls ();
+meta::function('usage', <<'__7ReV+2xSkKaDnXAdgszTEQyeJETOBChyE/THZJIifMs');
+<<"EOD" . ls ();
 Usage: $0 [options] action [arguments]
-Defined actions:
+Defined actions (and the attribute that defines them):
 EOD
-__oHVev4RtZlF/82SSE87y4Bf7ran2afn/HDtukOQBf9I
+__7ReV+2xSkKaDnXAdgszTEQyeJETOBChyE/THZJIifMs
 
 meta::function('vim', <<'__1EcCMR8Tks8HBoOg+zAKJ4LlrRIY8nvLs4M1VTr2Zec');
 # Installs VIM highlighters.
@@ -1206,30 +1242,44 @@ $noise =~ s/\//-/g;
 "$0.$noise";
 __zNSrihAkMKJG5spRYgcFdoNArFKig1u12gIp6gJ8pZw
 
-meta::library('terminal', <<'__bakqo5o+Exi5Kw4onujvi9Pu3zR9lQA8cPKfYj6L74Q');
+meta::library('terminal', <<'__pvD00lNNeQAXRGZFRNjR0bf9b/Z/rZgMgNL5zN4ZsQA');
 # Functions for nice-looking terminal output.
 
 package terminal;
 
-use constant black  => "0;0";
-use constant red    => "1;31";
-use constant yellow => "1;33";
-use constant green  => "1;32";
-use constant blue   => "1;34";
-use constant purple => "1;35";
-use constant cyan   => "1;36";
-
-my %default_colors = (info => green);
+my %color_conversions = (black  => "0;0",
+                         red    => "1;31",
+                         yellow => "1;33",
+                         green  => "1;32",
+                         blue   => "1;34",
+                         purple => "1;35",
+                         cyan   => "1;36");
 my $longest_prefix = 0;
-$longest_prefix = $longest_prefix < $_ ? $_ : $longest_prefix for map length, keys %default_colors;
+my %default_colors = ();
+
+sub color {
+  $default_colors{$_[0]} = $_[1];
+  $longest_prefix = $longest_prefix < length($_[0]) ? length($_[0]) : $longest_prefix;
+}
+
+color    'info',  'green';
+color  'status',  'green';
+color   'error',    'red';
+color 'warning', 'yellow';
 
 sub message {
   my ($prefix, $message) = @_;
-  my $color = $default_colors{$prefix};
+  my $color = $color_conversions{$default_colors{$prefix}};
   my $padding = ' ' x ($longest_prefix - length $prefix);
-  print "${padding}[\033[${color}m$prefix\033[0;0m] $message\n";
+  print STDERR "${padding}[\033[${color}m$prefix\033[0;0m] $message\n";
 }
-__bakqo5o+Exi5Kw4onujvi9Pu3zR9lQA8cPKfYj6L74Q
+__pvD00lNNeQAXRGZFRNjR0bf9b/Z/rZgMgNL5zN4ZsQA
+
+meta::list('dependencies', <<'__4G/zvk9ZsNVN4O8msqdggjhBfBUXLYzZLECQXcPUoNI');
+./divergence        main
+./divergence.rebase main
+./divergence.debug  main
+__4G/zvk9ZsNVN4O8msqdggjhBfBUXLYzZLECQXcPUoNI
 
 meta::sh('js', <<'__qGEHHjKcAKXQz3fhJNhOtnWH3pjzV5E13Ndz4KxZrvs');
 js __code__
