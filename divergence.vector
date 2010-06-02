@@ -608,7 +608,7 @@ as a key there (e.g. 'foo'), then it will be sandwiched between binary operators
   r.enable_inline_macro = (function (enabled) {return function () {enabled || (enabled = !! d.inline_macros.push ('$0.toString()'.compose (r.transform).compose (r.parse)))}}) (false)}) ();
 __iKLvuhGP+fVGDbBgwvx39uaPFG620YzJkcfaMGctVrg
 
-meta::code('main', <<'__xjXfDuZA4uH51jJ8uCH/+lHXNniKYqIA7vI7LxmA1QA');
+meta::code('main', <<'__yKPJ7mlO/dTTJU5qqdpyYxdOiSoCxGAxB7m+0fLyktg');
 Divergence vector geometry module | Spencer Tipping <spencer@spencertipping.com>
 Licensed under the terms of the MIT source code license
 
@@ -626,7 +626,7 @@ d.rebase (function () {
                                                             {'&': v >$> this * ((this % v) / (v % v)), '|': v >$> this - (this & v), '%': dot (n),
                                                         towards : (v, x) >$> this * (1.0 - x) + v * x,
                                                            unit : _ >$> this / this.distance(),  distance : _ >$> Math.sqrt (this % this),
-                                                           into : _ >$> this.constructor.create.apply (this, range(arguments.length) * (i >$> this % arguments[i].unit())),
+                                                           into : _ >$> this.constructor.create.apply (this, d.arr(arguments) * (v >$> this % v.unit())),
                                                            from : _ >$> range(arguments.length) * (i >$> arguments[i] * this[i]) / ((x, y) >$> x + y),
                                                        toString : _ >$> '<#{Array.prototype.join.call(this, ", ")}>'}),
                                        {create: 'new d.vector[#{n}] (#{(range(n) * (i >$> "$" + i)).join(",")})'.fn()}));
@@ -634,7 +634,7 @@ d.rebase (function () {
   d.init (v3.prototype, {'^': v >$> new v3 (this[1] * v[2] - this[2] * v[1], this[2] * v[0] - this[0] * v[2], this[0] * v[1] - this[1] * v[0]),
                       about : function (v, angle) {var b1 = v.unit(), o = this | b1, b2 = o.unit(), b3 = b1 ^ b2, l = o.distance();
                                                    return (this & b1) + b2 * (Math.cos(angle) * l) + b3 * (Math.sin(angle) * l)}})}) ();
-__xjXfDuZA4uH51jJ8uCH/+lHXNniKYqIA7vI7LxmA1QA
+__yKPJ7mlO/dTTJU5qqdpyYxdOiSoCxGAxB7m+0fLyktg
 
 meta::code('scratch', <<'__UFvA92B98GVzh3boXGxl19QiD9162rJI14MuI2vyVq0');
 This is for scratchwork that isn't part of your system. It could be used for testing or other experimentation.
